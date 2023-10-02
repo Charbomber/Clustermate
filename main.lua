@@ -11,6 +11,11 @@ function love.load()
   loveframes = require("libs.loveframes")
   loveframes.SetState("start")
 
+  json = require("libs.json")
+
+
+  require("reqs")
+
   -- The whole current cluster. AKA the project. This contains every animation.
   cluster = { -- There's a reason it's called a "cluster".
     ["default"] = { -- Default animation
@@ -18,7 +23,7 @@ function love.load()
         { -- frame 1
           sprites = {
             {
-              id = "testSprite"
+              id = "testSprite",
               image = "spr_test",
               -- image_base = "spr_test"
               -- image_after = "elemental"
@@ -34,7 +39,7 @@ function love.load()
         { -- frame 2
           sprites = {
             {
-              id = "testSprite"
+              id = "testSprite",
               image = "spr_test",
               x = 50,
               y = 0,
@@ -48,7 +53,7 @@ function love.load()
         { -- frame 3
           sprites = {
             {
-              id = "testSprite"
+              id = "testSprite",
               image = "spr_test",
               x = -50,
               y = 0,
@@ -62,7 +67,7 @@ function love.load()
         { -- frame 4
           sprites = {
             {
-              id = "testSprite"
+              id = "testSprite",
               image = "spr_test",
               x = 0,
               y = 0,
