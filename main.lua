@@ -21,6 +21,15 @@ function love.update(dt)
 
     loveframes.update(dt)
 
+    if love.keyboard.isDown('lctrl') and love.keyboard.isDown('escape') then
+      -- whoopsies
+      love.event.quit()
+    end
+
+    if love.keyboard.isDown('lctrl') and love.keyboard.isDown('f') then
+      love.window.setFullscreen(not love.window.getFullscreen())
+    end
+
 end
 
 function love.draw()
