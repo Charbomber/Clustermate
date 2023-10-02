@@ -11,6 +11,72 @@ function love.load()
   loveframes = require("libs.loveframes")
   loveframes.SetState("start")
 
+  -- The whole current cluster. AKA the project. This contains every animation.
+  cluster = { -- There's a reason it's called a "cluster".
+    ["default"] = { -- Default animation
+      frames = {
+        { -- frame 1
+          sprites = {
+            {
+              id = "testSprite"
+              image = "spr_test",
+              -- image_base = "spr_test"
+              -- image_after = "elemental"
+              x = 0,
+              y = 0,
+              scalex = 1,
+              scaley = 1,
+              actions = {["scaleIncreaseOverTime"] = 2}
+            }
+          },
+        },
+
+        { -- frame 2
+          sprites = {
+            {
+              id = "testSprite"
+              image = "spr_test",
+              x = 50,
+              y = 0,
+              scalex = "noChange",
+              scaley = "noChange",
+              actions = {}
+            }
+          },
+        },
+
+        { -- frame 3
+          sprites = {
+            {
+              id = "testSprite"
+              image = "spr_test",
+              x = -50,
+              y = 0,
+              scalex = "noChange",
+              scaley = "noChange",
+              actions = {}
+            }
+          },
+        },
+
+        { -- frame 4
+          sprites = {
+            {
+              id = "testSprite"
+              image = "spr_test",
+              x = 0,
+              y = 0,
+              scalex = "noChange",
+              scaley = "noChange",
+              actions = {["scaleIncreaseOverTime"] = 0}
+            }
+          },
+        },
+
+      },
+    },
+  }
+
 end
 
 
