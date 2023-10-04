@@ -1,21 +1,21 @@
 
-local newButton = loveframes.Create("button")
+local newButtonStart = loveframes.Create("button")
 
-newButton:SetState("start")
-newButton:SetWidth(256)
-newButton:SetPos(32, 128, false)
-newButton:SetText("New Cluster")
-newButton.OnClick = function(obj, x, y)
-    obj:SetText("Doesn't work yet lol")
+newButtonStart:SetState("start")
+newButtonStart:SetWidth(256)
+newButtonStart:SetPos(32, 128, false)
+newButtonStart:SetText("New Cluster")
+newButtonStart.OnClick = function(obj, x, y)
+    loveframes.SetState("project")
 end
 
 
-local loadButton = loveframes.Create("button")
+local loadButtonStart = loveframes.Create("button")
 
-loadButton:SetState("start")
-loadButton:SetWidth(256)
-loadButton:SetPos(32, 128+32, false)
-loadButton:SetText("Load Cluster")
-loadButton.OnClick = function(obj, x, y)
+loadButtonStart:SetState("start")
+loadButtonStart:SetWidth(256)
+loadButtonStart:SetPos(32, 128+32, false)
+loadButtonStart:SetText("Load Cluster")
+loadButtonStart.OnClick = function(obj, x, y)
     obj:SetText("Doesn't work yet lol")
 end

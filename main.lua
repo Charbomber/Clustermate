@@ -8,6 +8,8 @@
 
 function love.load()
 
+  math.randomseed(os.time())
+
   loveframes = require("libs.loveframes")
   loveframes.SetState("start")
 
