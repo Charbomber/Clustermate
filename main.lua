@@ -10,14 +10,6 @@ function love.load()
 
   math.randomseed(os.time())
 
-  loveframes = require("libs.loveframes")
-  loveframes.SetState("start")
-
-  json = require("libs.json")
-
-
-  require("reqs")
-
   -- The whole current cluster. AKA the project. This contains every animation.
   cluster = { -- There's a reason it's called a "cluster".
     ["default"] = { -- Default animation
@@ -86,21 +78,70 @@ function love.load()
 
 end
 
+loveframes = require("libs.loveframes")
+loveframes.SetState("start")
 
+json = require("libs.json")
 
+console = {}
 
+function debugConsole(message)
+  console[#console+1] = message
+end
+
+function stringConsole()
+  local finalString = ""
+  local starter = 1
+  if #console > 32 then
+    starter = #console-32
+  end
+
+  for i=starter,#console do
+    finalString = finalString..console[i]
+    if i < #console - 1 then
+      finalString = finalString.."\n"
+    end
+  end
+
+  return finalString
+end
+
+require("reqs")
+
+--updateCallbacks = {}
+
+local savedState = "start"
 
 function love.update(dt)
 
     loveframes.update(dt)
 
-    if love.keyboard.isDown('lctrl') and love.keyboard.isDown('escape') then
-      -- whoopsies
-      love.event.quit()
-    end
+    --for i=0,#updateCallbacks do
+    --  updateCallbacks[i]()
+    --end
 
-    if love.keyboard.isDown('lctrl') and love.keyboard.isDown('f') then
-      love.window.setFullscreen(not love.window.getFullscreen())
+    if loveframes.GetState() == "project" then
+      --- Project Update ---
+      -- Cam Movement
+      if love.keyboard.isDown('up') then
+        cameraY = cameraY - camSpeed
+      end
+      if love.keyboard.isDown('down') then
+        cameraY = cameraY + camSpeed
+      end
+      if love.keyboard.isDown('left') then
+        cameraX = cameraX - camSpeed
+      end
+      if love.keyboard.isDown('right') then
+        cameraX = cameraX + camSpeed
+      end
+
+      -- Debug Cam Return
+      if love.keyboard.isDown('lctrl') and love.keypressed('c') then
+        cameraX = (gridLength/2)-(love.graphics.getWidth()/2)
+        cameraY = (gridHeight/2)-(love.graphics.getHeight()/2)
+      end
+
     end
 
 end
@@ -108,6 +149,10 @@ end
 function love.draw()
 
     loveframes.draw()
+
+    if loveframes.GetState() == "console" then
+      love.graphics.print(stringConsole(), 0, 0)
+    end
 
 end
 
@@ -126,6 +171,66 @@ end
 function love.keypressed(key, scancode, isrepeat)
 
     loveframes.keypressed(key, isrepeat)
+    if loveframes.GetState() == "project" then
+      -- Increase Cam Speed
+      if key == '=' then
+        if camSpeed < 64 then
+          camSpeed = camSpeed + 8
+        end
+      end
+      -- Decrease Cam Speed
+      if key == '-' then
+        if camSpeed > 8 then
+          camSpeed = camSpeed - 8
+        end
+      end
+      -- Reset Cam Speed
+      if key == '0' then
+        camSpeed = 16
+      end
+
+      -- Increase Grid Subdivs
+      if key == ']' then
+        if gridSubdiv < 256 then
+          gridSubdiv = gridSubdiv * 2
+          bg:regenCanvas()
+        end
+      end
+      -- Decrease Grid Subdivs
+      if key == '[' then
+        if gridSubdiv > 8 then
+          gridSubdiv = gridSubdiv / 2
+          bg:regenCanvas()
+        end
+      end
+      -- Reset Grid Subdivs
+      if key == '\\' then
+        gridSubdiv = 32
+        bg:regenCanvas()
+      end
+    end
+
+
+    if love.keyboard.isDown('lctrl') and key == 'escape' then
+      -- whoopsies
+      love.event.quit()
+    end
+
+    if love.keyboard.isDown('lctrl') and key == 'f' then
+      love.window.setFullscreen(not love.window.getFullscreen())
+    end
+
+    if love.keyboard.isDown('lctrl') and key == 'c' then
+      if loveframes.GetState() ~= "console" then
+        savedState = loveframes.GetState()
+        loveframes.SetState("console")
+      else
+        loveframes.SetState(savedState)
+      end
+      if savedState == "console" then
+        savedState = "project"
+      end
+    end
 
 end
 

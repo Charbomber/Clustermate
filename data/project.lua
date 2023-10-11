@@ -4,16 +4,81 @@ require("data.tipoftheday")
 
 
 
-----------------
--- Background --
-----------------
--- ...Does this even need a big comment like this?
-local bg = loveframes.Create("image")
-bg:SetState("project")
-bg:SetImage("graphics/tempGrid.png")
-bg:SetPos(0, 0)
-bg:SetSize(love.graphics.getDimensions())
+selectedSprite = 0
+currentFrame = 0
+currentSprites = {}
+currentAnim = "default"
 
+
+---------------------
+-- Background Grid --
+---------------------
+
+local gridLength = 2048
+local gridHeight = 2048
+
+gridSubdiv = 32
+
+cameraX = (gridLength/2)-(love.graphics.getWidth()/2)
+cameraY = (gridHeight/2)-(love.graphics.getHeight()/2)
+camSpeed = 16
+
+
+local bgCanvas = love.graphics.newCanvas(gridLength, gridHeight)
+love.graphics.setCanvas(bgCanvas)
+-- Vertical Lines
+for i=0,gridLength/gridSubdiv do
+  if i == (gridLength/gridSubdiv)/2 then
+    love.graphics.setColor(0, 0, 1, 1)
+  else
+    love.graphics.setColor(0, 0, 0.5, 1)
+  end
+  love.graphics.line(i*gridSubdiv, 0, i*gridSubdiv, gridHeight)
+end
+-- Horizontal Lines
+for i=0,gridHeight/gridSubdiv do
+  if i == (gridHeight/gridSubdiv)/2 then
+    love.graphics.setColor(0, 0, 1, 1)
+  else
+    love.graphics.setColor(0, 0, 0.5, 1)
+  end
+  love.graphics.line(0, i*gridSubdiv, gridLength, i*gridSubdiv)
+end
+love.graphics.setCanvas()
+
+bg = loveframes.Create("image")
+bg:SetImage(bgCanvas)
+bg:SetState("project")
+bg:SetPos(-(cameraX+(gridLength/2)), -(cameraY+(gridHeight/2)))
+bg.Update = function(obj)
+  obj:SetPos(-cameraX, -cameraY)
+end
+
+bg.regenCanvas = function(obj)
+  local bgCanvas = love.graphics.newCanvas(gridLength, gridHeight)
+  love.graphics.setCanvas(bgCanvas)
+  -- Vertical Lines
+  for i=0,gridLength/gridSubdiv do
+    if i == (gridLength/gridSubdiv)/2 then
+      love.graphics.setColor(0, 0, 1, 1)
+    else
+      love.graphics.setColor(0, 0, 0.5, 1)
+    end
+    love.graphics.line(i*gridSubdiv, 0, i*gridSubdiv, gridHeight)
+  end
+  -- Horizontal Lines
+  for i=0,gridHeight/gridSubdiv do
+    if i == (gridHeight/gridSubdiv)/2 then
+      love.graphics.setColor(0, 0, 1, 1)
+    else
+      love.graphics.setColor(0, 0, 0.5, 1)
+    end
+    love.graphics.line(0, i*gridSubdiv, gridLength, i*gridSubdiv)
+  end
+  love.graphics.setCanvas()
+
+  bg:SetImage(bgCanvas)
+end
 
 
 
@@ -60,13 +125,13 @@ toolbar[1]:SetText("File")
 toolbar[1]:SetObject(filePanel)
 
 toolbar[1].OnMouseExit = function(obj)
-  if love.getMouseX() < obj.x then
-    obj:setOpen(false)
+  if love.mouse.getX() < obj.x then
+    obj:SetOpen(false)
   end
-  if love.getMouseX() > obj.x + obj.y then
-    obj:setOpen(false)
-    if love.getMouseY() < 32 then
-      toolbar[2]:setOpen(true)
+  if love.mouse.getX() > obj.x + obj.width then
+    obj:SetOpen(false)
+    if love.mouse.getY() < 32 then
+      --toolbar[2]:SetOpen(true)
     end
   end
 
@@ -88,14 +153,33 @@ end
 
 
 
+----------------
+-- Da Sprites --
+----------------
 
+function genSprites()
 
+  for i=#currentSprites,1,-1 do
+    currentSprites[i]:Remove()
+  end
+  currentSprites = {}
 
+  for i=1,#cluster[currentAnim].frames do
 
+    local sprite = cluster[currentAnim].frames[currentFrame]
+    print(sprite)
 
+    currentSprites[i] = loveframes.Create("image")
+    currentSprites[i]:SetImage(sprite.image)
+    currentSprites[i]:SetState("project")
+    --currentSprites[i]:SetPos(-(cameraX+(gridLength/2)), -(cameraY+(gridHeight/2)))
+    currentSprites[i].Update = function(obj)
+      obj:SetPos(256, 256)
+    end
+  end
 
-
-
+end
+--genSprites()
 
 
 
