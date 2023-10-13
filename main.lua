@@ -79,9 +79,9 @@ function love.load()
   loveframes = require("libs.loveframes")
   loveframes.SetState("start")
 
-  
 
-  math.randomseed(os.date("*t").yday)
+
+  --math.randomseed(os.date("*t").yday)
 
   json = require("libs.json")
 

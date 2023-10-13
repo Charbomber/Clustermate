@@ -20,10 +20,12 @@ local tipTable = {
   "Sugar is incredibly weak to poison!",
   "Try turning it off and then on again!",
   "Press the 'power button' to turn your 'computer' off!",
+  "Commit 5d3a626 is my favorite!",
 }
 
 
 function TipOfDay()
+  math.randomseed(os.date("*t").yday)
   local tip = tipTable[math.random(#tipTable)]
   debugConsole("Tip Gotten, here it is: \""..tip..'"')
   return tip

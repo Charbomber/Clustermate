@@ -198,6 +198,25 @@ genSprites()
 
 
 
+
+--------------------
+-- Sprites Window --
+--------------------
+
+local spriteWindow = loveframes.Create("frame")
+spriteWindow:SetState("project")
+spriteWindow:SetName("Sprites")
+spriteWindow:SetPos(love.graphics.getWidth()-128, 0)
+spriteWindow:SetWidth(128)
+spriteWindow:SetHeight(love.graphics.getHeight())
+spriteWindow:SetDraggable(false)
+spriteWindow:ShowCloseButton(false)
+
+--string.format("%06d", message.score)
+
+
+
+
 --------------------
 -- Tip Of The Day --
 --------------------
