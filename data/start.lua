@@ -19,3 +19,6 @@ loadButtonStart:SetText("Load Cluster")
 loadButtonStart.OnClick = function(obj, x, y)
     obj:SetText("Doesn't work yet lol")
 end
+
+
+debugConsole("start.lua Loaded")

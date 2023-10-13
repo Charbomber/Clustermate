@@ -5,112 +5,121 @@
 
 -- The animation editing tool for games in the CF Story series
 
+-- The whole current cluster. AKA the project. This contains every animation.
+cluster = { -- There's a reason it's called a "cluster".
+  ["default"] = { -- Default animation
+    frames = {
+      { -- frame 1
+        sprites = {
+          {
+            id = "testSprite",
+            image = "spr_test",
+            -- image_base = "spr_test"
+            -- image_after = "elemental"
+            x = 0,
+            y = 0,
+            scalex = 1,
+            scaley = 1,
+            actions = {["scaleIncreaseOverTime"] = 2}
+          }
+        },
+      },
+
+      { -- frame 2
+        sprites = {
+          {
+            id = "testSprite",
+            image = "spr_test",
+            x = 50,
+            y = 0,
+            scalex = "noChange",
+            scaley = "noChange",
+            actions = {}
+          }
+        },
+      },
+
+      { -- frame 3
+        sprites = {
+          {
+            id = "testSprite",
+            image = "spr_test",
+            x = -50,
+            y = 0,
+            scalex = "noChange",
+            scaley = "noChange",
+            actions = {}
+          }
+        },
+      },
+
+      { -- frame 4
+        sprites = {
+          {
+            id = "testSprite",
+            image = "spr_test",
+            x = 0,
+            y = 0,
+            scalex = "noChange",
+            scaley = "noChange",
+            actions = {["scaleIncreaseOverTime"] = 0}
+          }
+        },
+      },
+
+    },
+  },
+}
 
 function love.load()
 
-  math.randomseed(os.time())
+  VERSION = "0.0.1"
+  VERSION_TITLE = "Nesh"
 
-  -- The whole current cluster. AKA the project. This contains every animation.
-  cluster = { -- There's a reason it's called a "cluster".
-    ["default"] = { -- Default animation
-      frames = {
-        { -- frame 1
-          sprites = {
-            {
-              id = "testSprite",
-              image = "spr_test",
-              -- image_base = "spr_test"
-              -- image_after = "elemental"
-              x = 0,
-              y = 0,
-              scalex = 1,
-              scaley = 1,
-              actions = {["scaleIncreaseOverTime"] = 2}
-            }
-          },
-        },
+  loveframes = require("libs.loveframes")
+  loveframes.SetState("start")
 
-        { -- frame 2
-          sprites = {
-            {
-              id = "testSprite",
-              image = "spr_test",
-              x = 50,
-              y = 0,
-              scalex = "noChange",
-              scaley = "noChange",
-              actions = {}
-            }
-          },
-        },
+  
 
-        { -- frame 3
-          sprites = {
-            {
-              id = "testSprite",
-              image = "spr_test",
-              x = -50,
-              y = 0,
-              scalex = "noChange",
-              scaley = "noChange",
-              actions = {}
-            }
-          },
-        },
+  math.randomseed(os.date("*t").yday)
 
-        { -- frame 4
-          sprites = {
-            {
-              id = "testSprite",
-              image = "spr_test",
-              x = 0,
-              y = 0,
-              scalex = "noChange",
-              scaley = "noChange",
-              actions = {["scaleIncreaseOverTime"] = 0}
-            }
-          },
-        },
+  json = require("libs.json")
 
-      },
-    },
-  }
+  console = {}
 
-end
-
-loveframes = require("libs.loveframes")
-loveframes.SetState("start")
-
-json = require("libs.json")
-
-console = {}
-
-function debugConsole(message)
-  console[#console+1] = message
-end
-
-function stringConsole()
-  local finalString = ""
-  local starter = 1
-  if #console > 32 then
-    starter = #console-32
+  function debugConsole(message)
+    console[#console+1] = message
   end
 
-  for i=starter,#console do
-    finalString = finalString..console[i]
-    if i < #console - 1 then
-      finalString = finalString.."\n"
+  debugConsole("Clustermate Init")
+
+  function stringConsole()
+    local finalString = ""
+    local starter = 1
+    if #console > 32 then
+      starter = #console-32
     end
+
+    for i=starter,#console do
+      finalString = finalString..console[i]
+      if i < #console then
+        finalString = finalString.."\n"
+      end
+    end
+
+    return finalString
   end
 
-  return finalString
+  love.graphics.setBackgroundColor(0.1, 0.1, 0.1, 1)
+
+  require("reqs")
+
+  --updateCallbacks = {}
+
+  --genSprites()
+
+  local savedState = "start"
 end
-
-require("reqs")
-
---updateCallbacks = {}
-
-local savedState = "start"
 
 function love.update(dt)
 
@@ -136,12 +145,6 @@ function love.update(dt)
         cameraX = cameraX + camSpeed
       end
 
-      -- Debug Cam Return
-      if love.keyboard.isDown('lctrl') and love.keypressed('c') then
-        cameraX = (gridLength/2)-(love.graphics.getWidth()/2)
-        cameraY = (gridHeight/2)-(love.graphics.getHeight()/2)
-      end
-
     end
 
 end
@@ -151,7 +154,10 @@ function love.draw()
     loveframes.draw()
 
     if loveframes.GetState() == "console" then
-      love.graphics.print(stringConsole(), 0, 0)
+      love.graphics.setColor(1, 1, 1, 1)
+
+      love.graphics.print("Clustermate v"..VERSION.." (Version "..VERSION_TITLE..") Console:", 16, 16)
+      love.graphics.print(stringConsole(), 0, 64)
     end
 
 end
@@ -208,6 +214,13 @@ function love.keypressed(key, scancode, isrepeat)
         gridSubdiv = 32
         bg:regenCanvas()
       end
+
+      -- Debug Cam Return
+      if love.keyboard.isDown('lctrl') and key == 'r' then
+        cameraX = (gridLength/2)-(love.graphics.getWidth()/2)
+        cameraY = (gridHeight/2)-(love.graphics.getHeight()/2)
+      end
+
     end
 
 

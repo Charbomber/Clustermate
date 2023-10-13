@@ -4,8 +4,8 @@ require("data.tipoftheday")
 
 
 
-selectedSprite = 0
-currentFrame = 0
+selectedSprite = 1
+currentFrame = 1
 currentSprites = {}
 currentAnim = "default"
 
@@ -14,8 +14,8 @@ currentAnim = "default"
 -- Background Grid --
 ---------------------
 
-local gridLength = 2048
-local gridHeight = 2048
+gridLength = 2048
+gridHeight = 2048
 
 gridSubdiv = 32
 
@@ -157,6 +157,11 @@ end
 -- Da Sprites --
 ----------------
 
+function getSprite(id)
+  return cluster[currentAnim].frames[currentFrame].sprites[id]
+end
+
+
 function genSprites()
 
   for i=#currentSprites,1,-1 do
@@ -164,22 +169,31 @@ function genSprites()
   end
   currentSprites = {}
 
-  for i=1,#cluster[currentAnim].frames do
+  for i=1,#cluster[currentAnim].frames[currentFrame].sprites do
 
-    local sprite = cluster[currentAnim].frames[currentFrame]
-    print(sprite)
+    local sprite = getSprite(i)
+    --debugConsole(sprite.image)
 
     currentSprites[i] = loveframes.Create("image")
-    currentSprites[i]:SetImage(sprite.image)
+    currentSprites[i].sprite = getSprite(i)
+    currentSprites[i].spriteID = i
+    currentSprites[i]:SetImage("sprites/"..sprite.image..".png")
     currentSprites[i]:SetState("project")
-    --currentSprites[i]:SetPos(-(cameraX+(gridLength/2)), -(cameraY+(gridHeight/2)))
+    currentSprites[i]:SetPos(-(cameraX+(gridLength/2)), -(cameraY+(gridHeight/2)))
     currentSprites[i].Update = function(obj)
-      obj:SetPos(256, 256)
+
+      obj:SetPos(obj.sprite.x+(gridLength/2)-(obj:GetImage():getWidth()/2)-cameraX, obj.sprite.y+(gridHeight/2)-(obj:GetImage():getHeight()/2)-cameraY)
+
+      if selectedSprite == obj.spriteID then
+        love.graphics.setColor(0.5, 0.5, 1, 1)
+        love.graphics.rectangle("line", obj:GetX()-8, obj:GetY()-8, (obj:GetX()*obj:GetScaleX())+8, (obj:GetY()*obj:GetScaleY())+8)
+      end
+
     end
   end
 
 end
---genSprites()
+genSprites()
 
 
 
@@ -193,6 +207,10 @@ tipWindow:SetName("Tip of The Day!")
 tipWindow:CenterWithinArea(0, 0, love.graphics.getDimensions())
 tipWindow:SetWidth(256)
 tipWindow:SetHeight(256)
+
+local trashySays = loveframes.Create("image", tipWindow)
+trashySays:SetImage("graphics/trashySays.png")
+trashySays:SetPos(0, 24)
 
 local tipText = loveframes.Create("text", tipWindow)
 tipText:SetMaxWidth(200)
@@ -208,3 +226,6 @@ tipConfirm:SetText("Got it!")
 tipConfirm.OnClick = function(obj, x, y)
     tipWindow:Remove()
 end
+
+
+debugConsole("project.lua Loaded")

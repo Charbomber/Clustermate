@@ -13,9 +13,21 @@ local tipTable = {
   "Don't pull a pull block into another pull block or else!",
   "Do a backflip and throw a spear down to make a handy pole.",
   "Winners don't do drugs!",
+  "Keep your enemies close, and your friends closer.",
+  "I am completely unrelated to Bob the Hampster.",
+  "Trans rights!",
+  "Killer Queen has already touched the 'New Cluster' button!",
+  "Sugar is incredibly weak to poison!",
+  "Try turning it off and then on again!",
+  "Press the 'power button' to turn your 'computer' off!",
 }
 
 
 function TipOfDay()
-  return tipTable[math.random(#tipTable)]
+  local tip = tipTable[math.random(#tipTable)]
+  debugConsole("Tip Gotten, here it is: \""..tip..'"')
+  return tip
 end
+
+
+debugConsole("tipoftheday.lua Loaded")
