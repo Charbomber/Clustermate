@@ -71,45 +71,31 @@ cluster = { -- There's a reason it's called a "cluster".
   },
 }
 
+console = {}
+
+function debugConsole(message)
+  console[#console+1] = message
+end
+
 function love.load()
 
+  -- [VERSION] --
   VERSION = "0.0.1"
   VERSION_TITLE = "Nesh"
-
+  -- [LIBS] --
   loveframes = require("libs.loveframes")
   loveframes.SetState("start")
-  require 'libs/lovefs-noffi/lovefs'
-  require 'libs/lovefs-noffi/dialogs'
-
-
-  --math.randomseed(os.date("*t").yday)
-
+  if love.system.getOS() == "OS X" then
+    debugConsole("Cannot Load LoveFS (ffs)")
+  else
+    require 'libs/lovefs/lovefs'
+    require 'libs/lovefs/loveframesDialog'
+    fsload = lovefs()
+  	fssave = lovefs()
+  end
   json = require("libs.json")
 
-  console = {}
-
-  function debugConsole(message)
-    console[#console+1] = message
-  end
-
   debugConsole("Clustermate Init")
-
-  function stringConsole()
-    local finalString = ""
-    local starter = 1
-    if #console > 32 then
-      starter = #console-32
-    end
-
-    for i=starter,#console do
-      finalString = finalString..console[i]
-      if i < #console then
-        finalString = finalString.."\n"
-      end
-    end
-
-    return finalString
-  end
 
   love.graphics.setBackgroundColor(0.1, 0.1, 0.1, 1)
 
@@ -154,12 +140,7 @@ function love.draw()
 
     loveframes.draw()
 
-    if loveframes.GetState() == "console" then
-      love.graphics.setColor(1, 1, 1, 1)
-
-      love.graphics.print("Clustermate v"..VERSION.." (Version "..VERSION_TITLE..") Console:", 16, 16)
-      love.graphics.print(stringConsole(), 0, 64)
-    end
+    consoleDraw()
 
 end
 
@@ -244,6 +225,21 @@ function love.keypressed(key, scancode, isrepeat)
       if savedState == "console" then
         savedState = "project"
       end
+    end
+
+
+    if loveframes.GetState() == "console" then
+
+
+      if key == "return" then
+        loadstring(consoleString)
+        consoleString = ""
+      elseif key == "backspace" then
+        consoleString
+      else
+        consoleString = consoleString..key
+      end
+
     end
 
 end

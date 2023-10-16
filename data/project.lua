@@ -114,7 +114,13 @@ saveButtonFile:SetSize(40, 16)
 saveButtonFile:SetPos(0, 32, false)
 saveButtonFile:SetText("Save")
 saveButtonFile.OnClick = function(obj, x, y)
-    fssave:saveDialog(loveframes)
+    local save = json.encode(cluster)
+    if love.system.getOS() == "OS X" then
+      makeErrorWindow(40, "OS X Moment:tm:", "You get the drill.\nMac system, copying JSON to clipboard,\nsave in a file elsewhere.", false, true)
+      love.system.setClipboardText(save)
+    else
+      fssave:saveDialog(loveframes)
+    end
 end
 
 
@@ -182,8 +188,8 @@ function genSprites()
     --debugConsole(sprite.image)
 
     currentSprites[i] = loveframes.Create("image")
-    currentSprites[i].sprite = getSprite(i)
-    currentSprites[i].spriteID = "spr"..i
+    currentSprites[i].sprite = sprite
+    currentSprites[i].spriteID = sprite.ID
     currentSprites[i]:SetImage("sprites/"..sprite.image..".png")
     currentSprites[i]:SetState("project")
     currentSprites[i]:SetPos(-(cameraX+(gridLength/2)), -(cameraY+(gridHeight/2)))
@@ -220,14 +226,42 @@ spriteWindow:SetDraggable(false)
 spriteWindow:ShowCloseButton(false)
 
 spriteWindow.generateList = function(obj)
---string.format("%06d", message.score)
   for i=1,#currentSprites do
-
+    local spriteButton = loveframes.Create("button", spriteWindow)
+    spriteButton:SetHeight(16)
+    spriteButton:SetWidth(64)
+    spriteButton:SetPos(0, (i*16)+16)
+    spriteButton:SetText(string.format("%03d", i))
+    spriteButton.OnClick = function(obj, x, y)
+        --obj:Remove()
+    end
+  end
+  local addSpriteButton = loveframes.Create("button", spriteWindow)
+  addSpriteButton:SetHeight(16)
+  addSpriteButton:SetWidth(64)
+  addSpriteButton:SetPos(0, (#currentSprites*16)+32)
+  addSpriteButton:SetText("+")
+  addSpriteButton.OnClick = function(obj, x, y)
+    if #cluster[currentAnim].frames[currentFrame].sprites >= 999 then
+      makeErrorWindow(3, "Really? Over 999?", "If you need more than 999 sprites,\nyou have a problem.")
+    else
+      cluster[currentAnim].frames[currentFrame].sprites[#cluster[currentAnim].frames[currentFrame].sprites+1] = {
+        id = "testSprite",
+        image = "spr_test",
+        x = 0,
+        y = 0,
+        scalex = "noChange",
+        scaley = "noChange",
+        actions = {}
+      }
+      genSprites()
+      spriteWindow:generateList()
+    end
   end
 
 end
 
---spriteWindow:generateList()
+spriteWindow:generateList()
 
 
 --------------------
