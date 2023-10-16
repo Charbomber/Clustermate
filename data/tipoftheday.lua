@@ -25,7 +25,7 @@ local tipTable = {
 
 
 function TipOfDay()
-  math.randomseed(os.date("*t").yday)
+  math.randomseed(os.date("*t").yday + os.date("*t").year)
   local tip = tipTable[math.random(#tipTable)]
   debugConsole("Tip Gotten, here it is: \""..tip..'"')
   return tip

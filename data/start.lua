@@ -17,7 +17,10 @@ loadButtonStart:SetWidth(256)
 loadButtonStart:SetPos(32, 128+32, false)
 loadButtonStart:SetText("Load Cluster")
 loadButtonStart.OnClick = function(obj, x, y)
-    obj:SetText("Doesn't work yet lol")
+    dialogue = loadDialog(fs, {'JSON | *.json', 'All | *.*'})
+    fs.selectedFile
+
+    loveframes.SetState("project")
 end
 
 

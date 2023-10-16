@@ -2,7 +2,7 @@
 -- Error Window --
 ------------------
 
-function makeErrorWindow(error, title, message, buttons, sizeX, sizeY)
+function makeErrorWindow(error, title, message, buttons, canClose, sizeX, sizeY)
 
   if buttons == true then
     buttons = {
@@ -12,14 +12,23 @@ function makeErrorWindow(error, title, message, buttons, sizeX, sizeY)
   else
     buttons = buttons or {{"Okay.", function(obj, x, y) obj:GetBaseParent():Remove() end}}
   end
-  local sizeX = sizeX or 384
-  local sizeY = sizeY or 128
+
+  if sizeX == true then
+    sizeX = 512
+    sizeY = 512
+  else
+    sizeX = sizeX or 384
+    sizeY = sizeY or 128
+  end
+
+  local canClose = canClose or false
 
   local errorWindow = loveframes.Create("frame")
   errorWindow:SetState(loveframes.GetState())
   errorWindow:SetSize(sizeX, sizeY)
   errorWindow:SetName(title)
   errorWindow:Center()
+  errorWindow:ShowCloseButton(canClose)
 
   local errorMessage = loveframes.Create("text", errorWindow)
   errorMessage:SetText("ERROR "..tostring(error).."\n"..message)
@@ -37,4 +46,7 @@ function makeErrorWindow(error, title, message, buttons, sizeX, sizeY)
 end
 
 
-makeErrorWindow(-15, "Test Lol", "This error is fake! It's just a test :]")
+--makeErrorWindow(-15, "Test Lol", "This error is fake! It's just a test :]", {
+--{"NO!!!", function(obj, x, y)end},
+--{"ok,,,,,", function(obj, x, y) obj:GetBaseParent():Remove() end},
+--{"Die lol", function(obj, x, y) love.event.quit() end}})

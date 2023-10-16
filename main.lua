@@ -78,7 +78,8 @@ function love.load()
 
   loveframes = require("libs.loveframes")
   loveframes.SetState("start")
-
+  require 'libs/lovefs-noffi/lovefs'
+  require 'libs/lovefs-noffi/dialogs'
 
 
   --math.randomseed(os.date("*t").yday)

@@ -91,7 +91,7 @@ local inToolbar = false
 -- (Dropdowns)
 local filePanel = loveframes.Create("panel")
 filePanel:SetState("project")
-filePanel:SetSize(32, 32)
+filePanel:SetSize(32, 48)
 
 local newButtonFile = loveframes.Create("button", filePanel)
 newButtonFile:SetSize(40, 16)
@@ -109,6 +109,13 @@ loadButtonFile.OnClick = function(obj, x, y)
     --loveframes.SetState("project")
 end
 
+local saveButtonFile = loveframes.Create("button", filePanel)
+saveButtonFile:SetSize(40, 16)
+saveButtonFile:SetPos(0, 32, false)
+saveButtonFile:SetText("Save")
+saveButtonFile.OnClick = function(obj, x, y)
+    fssave:saveDialog(loveframes)
+end
 
 
 
@@ -176,7 +183,7 @@ function genSprites()
 
     currentSprites[i] = loveframes.Create("image")
     currentSprites[i].sprite = getSprite(i)
-    currentSprites[i].spriteID = i
+    currentSprites[i].spriteID = "spr"..i
     currentSprites[i]:SetImage("sprites/"..sprite.image..".png")
     currentSprites[i]:SetState("project")
     currentSprites[i]:SetPos(-(cameraX+(gridLength/2)), -(cameraY+(gridHeight/2)))
@@ -212,9 +219,15 @@ spriteWindow:SetHeight(love.graphics.getHeight())
 spriteWindow:SetDraggable(false)
 spriteWindow:ShowCloseButton(false)
 
+spriteWindow.generateList = function(obj)
 --string.format("%06d", message.score)
+  for i=1,#currentSprites do
 
+  end
 
+end
+
+--spriteWindow:generateList()
 
 
 --------------------
