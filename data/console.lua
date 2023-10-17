@@ -31,6 +31,7 @@ function consoleDraw()
 
     love.graphics.print("Clustermate v"..VERSION.." (Version "..VERSION_TITLE..") Console:", 16, 16)
     love.graphics.print(stringConsole(), 0, 64)
+    love.graphics.print(consoleString.."⎕", 0, 32)
   end
 
 end

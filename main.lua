@@ -112,6 +112,7 @@ function love.update(dt)
 
     loveframes.update(dt)
 
+
     --for i=0,#updateCallbacks do
     --  updateCallbacks[i]()
     --end
@@ -227,31 +228,33 @@ function love.keypressed(key, scancode, isrepeat)
       end
     end
 
-
+    -- this is dumb
     if loveframes.GetState() == "console" then
-
-
-      if key == "return" then
-        loadstring(consoleString)
-        consoleString = ""
-      elseif key == "backspace" then
-        consoleString
-      else
-        consoleString = consoleString..key
+      if key == "backspace" then
+        consoleString = consoleString:sub(1, -2)
       end
-
+      if key == "return" then
+        loadstring(consoleString)()
+        consoleString = ""
+      end
+      if love.keyboard.isDown('lctrl') and key == 'v' then
+        consoleString = consoleString..love.system.getClipboardText()
+      end
     end
 
+end
+
+function love.textinput(text)
+  loveframes.textinput(text)
+  if loveframes.GetState() == "console" and not love.keyboard.isDown('lctrl') then
+
+    consoleString = consoleString..text
+
+  end
 end
 
 function love.keyreleased(key)
 
     loveframes.keyreleased(key)
-
-end
-
-function love.textinput(text)
-
-    loveframes.textinput(text)
 
 end
