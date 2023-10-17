@@ -36,6 +36,20 @@ function consoleDraw()
 
 end
 
---function love.textinput(text)
+function processConsole()
 
---end
+  debugConsole(consoleString)
+  if consoleString:find("^dcr") then
+    debugConsole(loadstring("return "..consoleString:sub(4))())
+  elseif consoleString:find("^dcs") then
+    debugConsole(consoleString:sub(4))
+  else
+    try(loadstring(consoleString),
+    function()
+      debugConsole("Invalid Command: "..consoleString)
+    end)
+
+  end
+  consoleString = ""
+
+end

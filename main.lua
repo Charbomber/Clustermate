@@ -234,8 +234,7 @@ function love.keypressed(key, scancode, isrepeat)
         consoleString = consoleString:sub(1, -2)
       end
       if key == "return" then
-        loadstring(consoleString)()
-        consoleString = ""
+        processConsole()
       end
       if love.keyboard.isDown('lctrl') and key == 'v' then
         consoleString = consoleString..love.system.getClipboardText()

@@ -4,7 +4,7 @@ require("data.tipoftheday")
 
 
 
-selectedSprite = 1
+selectedSprite = 0
 currentFrame = 1
 currentSprites = {}
 currentAnim = "default"
@@ -189,7 +189,8 @@ function genSprites()
 
     currentSprites[i] = loveframes.Create("image")
     currentSprites[i].sprite = sprite
-    currentSprites[i].spriteID = sprite.ID
+    currentSprites[i].spriteID = sprite.id
+    currentSprites[i].localID = i
     currentSprites[i]:SetImage("sprites/"..sprite.image..".png")
     currentSprites[i]:SetState("project")
     currentSprites[i]:SetPos(-(cameraX+(gridLength/2)), -(cameraY+(gridHeight/2)))
@@ -197,11 +198,19 @@ function genSprites()
 
       obj:SetPos(obj.sprite.x+(gridLength/2)-(obj:GetImage():getWidth()/2)-cameraX, obj.sprite.y+(gridHeight/2)-(obj:GetImage():getHeight()/2)-cameraY)
 
-      if selectedSprite == obj.spriteID then
-        love.graphics.setColor(0.5, 0.5, 1, 1)
-        love.graphics.rectangle("line", obj:GetX()-8, obj:GetY()-8, (obj:GetX()*obj:GetScaleX())+8, (obj:GetY()*obj:GetScaleY())+8)
-      end
+    end
+    currentSprites[i].Draw = function(obj)
 
+      drawfunc = obj.DrawOver or obj.drawoverfunc
+	     if drawfunc then
+		      drawfunc(obj)
+	     end
+
+      if selectedSprite == obj.localID then
+        --debugConsole("test")
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.rectangle("line", obj:GetX()-8, obj:GetY()-8, (obj:GetImage():getWidth()*obj:GetScaleX())+8, (obj:GetImage():getHeight()*obj:GetScaleY())+8)
+      end
     end
   end
 
@@ -219,8 +228,8 @@ genSprites()
 local spriteWindow = loveframes.Create("frame")
 spriteWindow:SetState("project")
 spriteWindow:SetName("Sprites")
-spriteWindow:SetPos(love.graphics.getWidth()-128, 0)
-spriteWindow:SetWidth(128)
+spriteWindow:SetPos(love.graphics.getWidth()-64, 0)
+spriteWindow:SetWidth(64)
 spriteWindow:SetHeight(love.graphics.getHeight())
 spriteWindow:SetDraggable(false)
 spriteWindow:ShowCloseButton(false)
@@ -231,9 +240,10 @@ spriteWindow.generateList = function(obj)
     spriteButton:SetHeight(16)
     spriteButton:SetWidth(64)
     spriteButton:SetPos(0, (i*16)+16)
+    spriteButton.id = i
     spriteButton:SetText(string.format("%03d", i))
     spriteButton.OnClick = function(obj, x, y)
-        --obj:Remove()
+        selectedSprite = obj.id
     end
   end
   local addSpriteButton = loveframes.Create("button", spriteWindow)
