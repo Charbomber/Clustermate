@@ -133,6 +133,9 @@ function love.update(dt)
         cameraX = cameraX + camSpeed
       end
 
+      moveSpritesHeld()
+      spritesMouse()
+
     end
 
 end
@@ -142,6 +145,7 @@ function love.draw()
     loveframes.draw()
 
     consoleDraw()
+    drawSelection()
 
 end
 
@@ -203,6 +207,8 @@ function love.keypressed(key, scancode, isrepeat)
         cameraX = (gridLength/2)-(love.graphics.getWidth()/2)
         cameraY = (gridHeight/2)-(love.graphics.getHeight()/2)
       end
+
+      moveSpritesPressed(key)
 
     end
 

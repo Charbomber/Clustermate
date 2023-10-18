@@ -5,6 +5,7 @@ require("data.tipoftheday")
 
 
 selectedSprite = 0
+mouseSelected = false
 currentFrame = 1
 currentSprites = {}
 currentAnim = "default"
@@ -199,25 +200,68 @@ function genSprites()
       obj:SetPos(obj.sprite.x+(gridLength/2)-(obj:GetImage():getWidth()/2)-cameraX, obj.sprite.y+(gridHeight/2)-(obj:GetImage():getHeight()/2)-cameraY)
 
     end
-    currentSprites[i].Draw = function(obj)
 
-      drawfunc = obj.DrawOver or obj.drawoverfunc
-	     if drawfunc then
-		      drawfunc(obj)
-	     end
-
-      if selectedSprite == obj.localID then
-        --debugConsole("test")
-        love.graphics.setColor(1, 1, 1, 1)
-        love.graphics.rectangle("line", obj:GetX()-8, obj:GetY()-8, (obj:GetImage():getWidth()*obj:GetScaleX())+8, (obj:GetImage():getHeight()*obj:GetScaleY())+8)
-      end
-    end
   end
 
 end
 genSprites()
 
 
+
+function drawSelection()
+  if selectedSprite ~= 0 then
+    local obj = currentSprites[selectedSprite]
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.rectangle("line", obj:GetX()-8, obj:GetY()-8, (obj:GetImage():getWidth()*obj:GetScaleX())+16, (obj:GetImage():getHeight()*obj:GetScaleY())+16)
+  end
+end
+
+function moveSpritesPressed(key)
+  if selectedSprite ~= 0 and not (love.keyboard.isDown('lshift') or love.keyboard.isDown('rshift')) then
+    local currentSelected = currentSprites[selectedSprite]
+    if key == "w" then
+      currentSelected.sprite.y = math.floor(currentSelected.sprite.y/gridSubdiv)*gridSubdiv - gridSubdiv
+    elseif key == "a" then
+      currentSelected.sprite.x = math.floor(currentSelected.sprite.x/gridSubdiv)*gridSubdiv - gridSubdiv
+    elseif key == "s" then
+      currentSelected.sprite.y = math.floor(currentSelected.sprite.y/gridSubdiv)*gridSubdiv + gridSubdiv
+    elseif key == "d" then
+      currentSelected.sprite.x = math.floor(currentSelected.sprite.x/gridSubdiv)*gridSubdiv + gridSubdiv
+    end
+  end
+end
+
+function moveSpritesHeld()
+  if selectedSprite ~= 0 and (love.keyboard.isDown('lshift') or love.keyboard.isDown('rshift')) then
+    local currentSelected = currentSprites[selectedSprite]
+    if love.keyboard.isDown('w') then
+      currentSelected.sprite.y = currentSelected.sprite.y - 1
+    elseif love.keyboard.isDown('a') then
+      currentSelected.sprite.x = currentSelected.sprite.x - 1
+    elseif love.keyboard.isDown('s') then
+      currentSelected.sprite.y = currentSelected.sprite.y + 1
+    elseif love.keyboard.isDown('d') then
+      currentSelected.sprite.x = currentSelected.sprite.x + 1
+    end
+
+  end
+end
+
+function spritesMouse()
+  if love.mouse.isDown(1) then
+    if love.keyboard.isDown('lshift') or love.keyboard.isDown('rshift') then
+      -- Shift
+      if selectedSprite ~= 0 then
+        local currentSelected = currentSprites[selectedSprite]
+        currentSelected.sprite.x = love.mouse.getX() - cameraX - (currentSelected:GetImage():getWidth()/2)
+        currentSelected.sprite.y = love.mouse.getY() - cameraY - (currentSelected:GetImage():getHeight()/2)
+      end
+    else
+      -- No Shift
+      selectedSprite = 0
+    end
+  end
+end
 
 
 
