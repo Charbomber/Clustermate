@@ -6,8 +6,11 @@ require("data.tipoftheday")
 
 selectedSprite = 0
 mouseSelected = false
+timeSinceSelected = 0
 currentFrame = 1
 currentSprites = {}
+currentSpriteButtons = {}
+frameButtons = {}
 currentAnim = "default"
 
 
@@ -180,6 +183,7 @@ function genSprites()
 
   for i=#currentSprites,1,-1 do
     currentSprites[i]:Remove()
+    debugConsole("Removed Sprite")
   end
   currentSprites = {}
 
@@ -204,7 +208,6 @@ function genSprites()
   end
 
 end
-genSprites()
 
 
 
@@ -212,8 +215,9 @@ function drawSelection()
   if selectedSprite ~= 0 then
     local obj = currentSprites[selectedSprite]
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.rectangle("line", obj:GetX()-8, obj:GetY()-8, (obj:GetImage():getWidth()*obj:GetScaleX())+16, (obj:GetImage():getHeight()*obj:GetScaleY())+16)
+    love.graphics.rectangle("line", obj:GetX()-8-timeSinceSelected, obj:GetY()-8-timeSinceSelected, (obj:GetImage():getWidth()*obj:GetScaleX())+16+(timeSinceSelected*2), (obj:GetImage():getHeight()*obj:GetScaleY())+16+(timeSinceSelected*2))
   end
+  if timeSinceSelected > 0 then timeSinceSelected = timeSinceSelected-16 end
 end
 
 function moveSpritesPressed(key)
@@ -253,8 +257,8 @@ function spritesMouse()
       -- Shift
       if selectedSprite ~= 0 then
         local currentSelected = currentSprites[selectedSprite]
-        currentSelected.sprite.x = love.mouse.getX() - cameraX - (currentSelected:GetImage():getWidth()/2)
-        currentSelected.sprite.y = love.mouse.getY() - cameraY - (currentSelected:GetImage():getHeight()/2)
+        currentSelected.sprite.x = (cameraX-(gridLength/2)) + love.mouse.getX()
+        currentSelected.sprite.y = (cameraY-(gridHeight/2)) + love.mouse.getY()
       end
     else
       -- No Shift
@@ -279,17 +283,32 @@ spriteWindow:SetDraggable(false)
 spriteWindow:ShowCloseButton(false)
 
 spriteWindow.generateList = function(obj)
+
+  for i=#currentSpriteButtons,1,-1 do
+    currentSpriteButtons[i]:Remove()
+    debugConsole("Removed Sprite Button")
+  end
+  currentSpriteButtons = {}
+
   for i=1,#currentSprites do
-    local spriteButton = loveframes.Create("button", spriteWindow)
-    spriteButton:SetHeight(16)
-    spriteButton:SetWidth(64)
-    spriteButton:SetPos(0, (i*16)+16)
-    spriteButton.id = i
-    spriteButton:SetText(string.format("%03d", i))
-    spriteButton.OnClick = function(obj, x, y)
+    currentSpriteButtons[i] = loveframes.Create("button", spriteWindow)
+    currentSpriteButtons[i]:SetHeight(16)
+    currentSpriteButtons[i]:SetWidth(64)
+    currentSpriteButtons[i]:SetPos(0, (i*16)+16)
+    currentSpriteButtons[i].id = i
+    currentSpriteButtons[i]:SetText(string.format("%03d", i))
+    currentSpriteButtons[i].OnClick = function(obj, x, y)
         selectedSprite = obj.id
+        timeSinceSelected = 64
     end
   end
+
+  if addSpriteButton then
+    addSpriteButton:Remove()
+    addSpriteButton = nil
+    debugConsole("Removed Add Sprite Button")
+  end
+
   local addSpriteButton = loveframes.Create("button", spriteWindow)
   addSpriteButton:SetHeight(16)
   addSpriteButton:SetWidth(64)
@@ -315,7 +334,91 @@ spriteWindow.generateList = function(obj)
 
 end
 
-spriteWindow:generateList()
+
+
+
+------------------
+-- Frame Window --
+------------------
+
+local frameWindow = loveframes.Create("frame")
+frameWindow:SetState("project")
+frameWindow:SetName("Frames")
+frameWindow:SetPos(0, love.graphics.getHeight()-64)
+frameWindow:SetWidth(love.graphics.getWidth()-64)
+frameWindow:SetHeight(64)
+frameWindow:SetDraggable(false)
+frameWindow:ShowCloseButton(false)
+
+
+
+function genFrames()
+
+  for i=#frameButtons,1,-1 do
+    frameButtons[i]:Remove()
+    debugConsole("Removed Frame Button")
+  end
+  frameButtons = {}
+
+  for i=1,#cluster[currentAnim].frames do
+
+    frameButtons[i] = loveframes.Create("imagebutton", frameWindow)
+    frameButtons[i].localID = i
+    frameButtons[i]:SetText("")
+    frameButtons[i]:SetPos(i*16, 32)
+    frameButtons[i]:SetImage("graphics/frameEmpty.png")
+    frameButtons[i]:SizeToImage()
+    frameButtons[i].Update = function(obj)
+
+      if #cluster[currentAnim].frames[obj.localID].sprites > 0 then
+        if currentFrame == obj.localID then
+          obj:SetImage("graphics/frameNormalSelected.png")
+        else
+          obj:SetImage("graphics/frameNormal.png")
+        end
+      else
+        if currentFrame == obj.localID then
+          obj:SetImage("graphics/frameEmptySelected.png")
+        else
+          obj:SetImage("graphics/frameEmpty.png")
+        end
+      end
+
+    end
+    frameButtons[i].OnClick = function(obj)
+      currentFrame = obj.localID
+      fullRegenSprites()
+    end
+
+  end
+
+  if addFrameButton then
+    addFrameButton:Remove()
+    addFrameButton = nil
+    debugConsole("Removed Add Frame Button")
+  end
+
+  addFrameButton = loveframes.Create("imagebutton", frameWindow)
+  addFrameButton:SetText("")
+  addFrameButton:SetPos((#cluster[currentAnim].frames+1)*16, 32)
+  addFrameButton:SetImage("graphics/frameAdd.png")
+  addFrameButton:SizeToImage()
+  addFrameButton.OnClick = function(obj)
+    cluster[currentAnim].frames[#cluster[currentAnim].frames+1] = makeNewFrame()
+    addFrameButton:SetPos((#cluster[currentAnim].frames+1)*16, 32)
+    currentFrame = #cluster[currentAnim].frames
+    regenProject()
+  end
+
+end
+
+function makeNewFrame()
+  local tempTable = { -- new frame
+    sprites = {
+    },
+  }
+  return tempTable
+end
 
 
 --------------------
@@ -345,6 +448,22 @@ tipConfirm:SetY(224)
 tipConfirm:SetText("Got it!")
 tipConfirm.OnClick = function(obj, x, y)
     tipWindow:Remove()
+end
+
+
+-------------
+-- Helpers --
+-------------
+
+function regenProject()
+  genFrames()
+  genSprites()
+  spriteWindow:generateList()
+end
+
+function fullRegenSprites()
+  genSprites()
+  spriteWindow:generateList()
 end
 
 

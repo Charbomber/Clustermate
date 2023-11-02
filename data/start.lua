@@ -7,6 +7,7 @@ newButtonStart:SetPos(32, 128, false)
 newButtonStart:SetText("New Cluster")
 newButtonStart.OnClick = function(obj, x, y)
     loveframes.SetState("project")
+    regenProject()
 end
 
 
@@ -34,6 +35,7 @@ loadButtonStart.OnClick = function(obj, x, y)
     else
       fsload:loadDialog(loveframes, nil, {'JSON | *.json', 'All | *.*'})
     end
+    regenProject()
 end
 
 
