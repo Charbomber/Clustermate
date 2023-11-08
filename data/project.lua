@@ -201,7 +201,19 @@ function genSprites()
     currentSprites[i]:SetPos(-(cameraX+(gridLength/2)), -(cameraY+(gridHeight/2)))
     currentSprites[i].Update = function(obj)
 
-      obj:SetPos(obj.sprite.x+(gridLength/2)-(obj:GetImage():getWidth()/2)-cameraX, obj.sprite.y+(gridHeight/2)-(obj:GetImage():getHeight()/2)-cameraY)
+      if type(obj.sprite.x) == "number" and type(obj.sprite.y) == "number" then
+        obj:SetPos(obj.sprite.x+(gridLength/2)-(obj:GetImage():getWidth()/2)-cameraX, obj.sprite.y+(gridHeight/2)-(obj:GetImage():getHeight()/2)-cameraY)
+      elseif type(obj.sprite.x) == "string" or type(obj.sprite.y) == "string" then
+        if obj.sprite.x:match("^%-?%d+$") then
+          obj:SetPos(tonumber(obj.sprite.x)+(gridLength/2)-(obj:GetImage():getWidth()/2)-cameraX, tonumber(obj.sprite.y)+(gridHeight/2)-(obj:GetImage():getHeight()/2)-cameraY)
+        elseif currentFrame > 0 then
+
+        else
+          obj:SetPos((gridLength/2)-(obj:GetImage():getWidth()/2)-cameraX, (gridHeight/2)-(obj:GetImage():getHeight()/2)-cameraY)
+        end
+      end
+
+
 
     end
 
@@ -261,8 +273,12 @@ function spritesMouse()
         currentSelected.sprite.y = (cameraY-(gridHeight/2)) + love.mouse.getY()
       end
     else
-      -- No Shift
-      selectedSprite = 0
+      -- No Shift (temporarily disabled)
+      --selectedSprite = 0
+      --if editSpriteWindow then
+      --  editSpriteWindow:Remove()
+      --  editSpriteWindow = nil
+      --end
     end
   end
 end
@@ -300,6 +316,7 @@ spriteWindow.generateList = function(obj)
     currentSpriteButtons[i].OnClick = function(obj, x, y)
         selectedSprite = obj.id
         timeSinceSelected = 64
+        makeEditSpriteWindow()
     end
   end
 
@@ -316,7 +333,7 @@ spriteWindow.generateList = function(obj)
   addSpriteButton:SetText("+")
   addSpriteButton.OnClick = function(obj, x, y)
     if #cluster[currentAnim].frames[currentFrame].sprites >= 999 then
-      makeErrorWindow(3, "Really? Over 999?", "If you need more than 999 sprites,\nyou have a problem.")
+      makeErrorWindow(999, "Really? Over 999?", "If you need more than 999 sprites,\nyou have a problem.")
     else
       cluster[currentAnim].frames[currentFrame].sprites[#cluster[currentAnim].frames[currentFrame].sprites+1] = {
         id = "testSprite",
@@ -418,6 +435,51 @@ function makeNewFrame()
     },
   }
   return tempTable
+end
+
+
+
+
+------------------------
+-- Edit Sprite Window --
+------------------------
+
+function makeEditSpriteWindow()
+
+  if editSpriteWindow then
+    editSpriteWindow:Remove()
+  end
+
+  editSpriteWindow = loveframes.Create("frame")
+  editSpriteWindow:SetState("project")
+  editSpriteWindow:SetPos(64, 64)
+  editSpriteWindow:SetName("Edit Selected Sprite")
+  editSpriteWindow:SetWidth(256)
+  editSpriteWindow:SetHeight(256)
+
+  editSpriteWindow.sprite = cluster[currentAnim].frames[currentFrame].sprites[selectedSprite]
+
+  local xInput = loveframes.Create("textinput", editSpriteWindow)
+  xInput:SetPos(64, 32)
+  xInput:SetWidth(64)
+  xInput:SetText(tostring(cluster[currentAnim].frames[currentFrame].sprites[selectedSprite].x))
+  xInput.Update = function(obj)
+    xInput:SetText(tostring(cluster[currentAnim].frames[currentFrame].sprites[selectedSprite].x))
+  end
+  xInput.UpdateSprite = function(obj, text)
+    if text == "u" then
+      obj:GetBaseParent().sprite.x = 0
+    elseif text:match("^%-?%d+$") then
+      obj:GetBaseParent().sprite.x = tonumber(obj:GetText())
+    else
+      obj:GetBaseParent().sprite.x = 0
+    end
+  end
+  xInput.OnEnter = function(obj, text)
+    xInput:UpdateSprite(text)
+  end
+
+
 end
 
 

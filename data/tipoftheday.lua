@@ -21,6 +21,11 @@ local tipTable = {
   "Try turning it off and then on again!",
   "Press the 'power button' to turn your 'computer' off!",
   "Commit 5d3a626 is my favorite!",
+  "Viewer Suggested Tip: Remember to vote! I guess!",
+  "Viewer Suggested Tip: Don't go to bed at 12 AM!",
+  "Viewer Suggested Tip: Buy a man eat fish he day. teach a man, to a lifetime",
+  "Trust nobody.",
+  "DO NOT.",
 }
 
 

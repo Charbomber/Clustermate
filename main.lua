@@ -30,7 +30,7 @@ cluster = { -- There's a reason it's called a "cluster".
           {
             id = "testSprite",
             image = "spr_test",
-            x = 50,
+            x = 64,
             y = 0,
             scalex = "noChange",
             scaley = "noChange",
@@ -44,7 +44,7 @@ cluster = { -- There's a reason it's called a "cluster".
           {
             id = "testSprite",
             image = "spr_test",
-            x = -50,
+            x = -64,
             y = 0,
             scalex = "noChange",
             scaley = "noChange",
