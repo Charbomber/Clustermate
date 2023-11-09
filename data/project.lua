@@ -187,6 +187,12 @@ function genSprites()
   end
   currentSprites = {}
 
+  if editSpriteWindow then
+    editSpriteWindow:Remove()
+    editSpriteWindow = nil
+  end
+  selectedSprite = 0
+
   for i=1,#cluster[currentAnim].frames[currentFrame].sprites do
 
     local sprite = getSprite(i)
@@ -237,12 +243,24 @@ function moveSpritesPressed(key)
     local currentSelected = currentSprites[selectedSprite]
     if key == "w" then
       currentSelected.sprite.y = math.floor(currentSelected.sprite.y/gridSubdiv)*gridSubdiv - gridSubdiv
+      if editSpriteWindow then
+        editSpriteWindow:UpdatePosText()
+      end
     elseif key == "a" then
       currentSelected.sprite.x = math.floor(currentSelected.sprite.x/gridSubdiv)*gridSubdiv - gridSubdiv
+      if editSpriteWindow then
+        editSpriteWindow:UpdatePosText()
+      end
     elseif key == "s" then
       currentSelected.sprite.y = math.floor(currentSelected.sprite.y/gridSubdiv)*gridSubdiv + gridSubdiv
+      if editSpriteWindow then
+        editSpriteWindow:UpdatePosText()
+      end
     elseif key == "d" then
       currentSelected.sprite.x = math.floor(currentSelected.sprite.x/gridSubdiv)*gridSubdiv + gridSubdiv
+      if editSpriteWindow then
+        editSpriteWindow:UpdatePosText()
+      end
     end
   end
 end
@@ -252,12 +270,24 @@ function moveSpritesHeld()
     local currentSelected = currentSprites[selectedSprite]
     if love.keyboard.isDown('w') then
       currentSelected.sprite.y = currentSelected.sprite.y - 1
+      if editSpriteWindow then
+        editSpriteWindow:UpdatePosText()
+      end
     elseif love.keyboard.isDown('a') then
       currentSelected.sprite.x = currentSelected.sprite.x - 1
+      if editSpriteWindow then
+        editSpriteWindow:UpdatePosText()
+      end
     elseif love.keyboard.isDown('s') then
       currentSelected.sprite.y = currentSelected.sprite.y + 1
+      if editSpriteWindow then
+        editSpriteWindow:UpdatePosText()
+      end
     elseif love.keyboard.isDown('d') then
       currentSelected.sprite.x = currentSelected.sprite.x + 1
+      if editSpriteWindow then
+        editSpriteWindow:UpdatePosText()
+      end
     end
 
   end
@@ -271,6 +301,9 @@ function spritesMouse()
         local currentSelected = currentSprites[selectedSprite]
         currentSelected.sprite.x = (cameraX-(gridLength/2)) + love.mouse.getX()
         currentSelected.sprite.y = (cameraY-(gridHeight/2)) + love.mouse.getY()
+        if editSpriteWindow then
+          editSpriteWindow:UpdatePosText()
+        end
       end
     else
       -- No Shift (temporarily disabled)
@@ -297,6 +330,13 @@ spriteWindow:SetWidth(64)
 spriteWindow:SetHeight(love.graphics.getHeight())
 spriteWindow:SetDraggable(false)
 spriteWindow:ShowCloseButton(false)
+
+spriteWindow.Update = function(obj)
+
+  spriteWindow:SetPos(love.graphics.getWidth()-64, 0)
+  spriteWindow:SetHeight(love.graphics.getHeight())
+
+end
 
 spriteWindow.generateList = function(obj)
 
@@ -367,6 +407,11 @@ frameWindow:SetHeight(64)
 frameWindow:SetDraggable(false)
 frameWindow:ShowCloseButton(false)
 
+
+frameWindow.Update = function(obj)
+  obj:SetPos(0, love.graphics.getHeight()-64)
+  obj:SetWidth(love.graphics.getWidth()-64)
+end
 
 
 function genFrames()
@@ -459,16 +504,41 @@ function makeEditSpriteWindow()
 
   editSpriteWindow.sprite = cluster[currentAnim].frames[currentFrame].sprites[selectedSprite]
 
+  editSpriteWindow.UpdatePosText = function(obj)
+    local children = obj:GetChildren()
+
+    for i=1,#children do
+      if children[i].UpdateTextPos then
+        children[i]:UpdateTextPos()
+      end
+    end
+  end
+
+  editSpriteWindow.OnClose = function(obj)
+    selectedSprite = 0
+  end
+
+  local xText = loveframes.Create("text", editSpriteWindow)
+  xText:SetText("X:")
+  xText:SetPos(16, 32)
+
   local xInput = loveframes.Create("textinput", editSpriteWindow)
-  xInput:SetPos(64, 32)
-  xInput:SetWidth(64)
+  xInput:SetPos(32, 32)
+  xInput:SetWidth(48)
+  xInput:SetHeight(16)
   xInput:SetText(tostring(cluster[currentAnim].frames[currentFrame].sprites[selectedSprite].x))
-  xInput.Update = function(obj)
+  xInput.UpdateTextPos = function(obj)
     xInput:SetText(tostring(cluster[currentAnim].frames[currentFrame].sprites[selectedSprite].x))
   end
   xInput.UpdateSprite = function(obj, text)
     if text == "u" then
-      obj:GetBaseParent().sprite.x = 0
+
+      if currentFrame == 1 then
+        obj:GetBaseParent().sprite.x = 0
+      else
+        -- TODO: unchanged sprite x/y
+      end
+
     elseif text:match("^%-?%d+$") then
       obj:GetBaseParent().sprite.x = tonumber(obj:GetText())
     else
@@ -477,6 +547,37 @@ function makeEditSpriteWindow()
   end
   xInput.OnEnter = function(obj, text)
     xInput:UpdateSprite(text)
+  end
+
+  local yText = loveframes.Create("text", editSpriteWindow)
+  yText:SetText("Y:")
+  yText:SetPos(96, 32)
+
+  local yInput = loveframes.Create("textinput", editSpriteWindow)
+  yInput:SetPos(112, 32)
+  yInput:SetWidth(48)
+  yInput:SetHeight(16)
+  yInput:SetText(tostring(cluster[currentAnim].frames[currentFrame].sprites[selectedSprite].y))
+  yInput.UpdateTextPos = function(obj)
+    yInput:SetText(tostring(cluster[currentAnim].frames[currentFrame].sprites[selectedSprite].y))
+  end
+  yInput.UpdateSprite = function(obj, text)
+    if text == "u" then
+
+      if currentFrame == 1 then
+        obj:GetBaseParent().sprite.y = 0
+      else
+        -- TODO: unchanged sprite x/y
+      end
+
+    elseif text:match("^%-?%d+$") then
+      obj:GetBaseParent().sprite.y = tonumber(obj:GetText())
+    else
+      obj:GetBaseParent().sprite.y = 0
+    end
+  end
+  yInput.OnEnter = function(obj, text)
+    yInput:UpdateSprite(text)
   end
 
 
