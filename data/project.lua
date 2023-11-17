@@ -546,7 +546,7 @@ function makeEditSpriteWindow()
     end
   end
   xInput.OnEnter = function(obj, text)
-    xInput:UpdateSprite(text)
+    obj:UpdateSprite(text)
   end
 
   local yText = loveframes.Create("text", editSpriteWindow)
@@ -577,11 +577,51 @@ function makeEditSpriteWindow()
     end
   end
   yInput.OnEnter = function(obj, text)
-    yInput:UpdateSprite(text)
+    obj:UpdateSprite(text)
+  end
+
+
+  local imageText = loveframes.Create("text", editSpriteWindow)
+  imageText:SetText("Image:")
+  imageText:SetPos(16, 64)
+
+  local imageInput = loveframes.Create("textinput", editSpriteWindow)
+  imageInput:SetPos(64, 64)
+  imageInput:SetWidth(96)
+  imageInput:SetHeight(16)
+  imageInput:SetText(cluster[currentAnim].frames[currentFrame].sprites[selectedSprite].image)
+  imageInput.UpdateTextImage = function(obj)
+    imageInput:SetText(cluster[currentAnim].frames[currentFrame].sprites[selectedSprite].image)
+  end
+  imageInput.UpdateSprite = function(obj, text)
+    if love.filesystem.getInfo("sprites/"..obj:GetText()..".png") then
+      obj:GetBaseParent().sprite.image = obj:GetText()
+      genSprites()
+    else
+      makeErrorWindow(192, "No Sprite of That Name", "There's no sprite of that filename in that path.\nPath is sprites/"..obj:GetText()..".png", true)
+    end
+  end
+  imageInput.OnEnter = function(obj, text)
+    obj:UpdateSprite(text)
   end
 
 
 end
+
+
+
+---------------------------------
+-- Animation Navigation Window --
+---------------------------------
+
+animationWindow = loveframes.Create("frame")
+animationWindow:SetState("project")
+animationWindow:SetName("Animations")
+animationWindow:SetX(32)
+animationWindow:CenterY()
+animationWindow:SetWidth(128)
+animationWindow:SetHeight(256)
+animationWindow:ShowCloseButton(false)
 
 
 --------------------
