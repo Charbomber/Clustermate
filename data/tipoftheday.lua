@@ -32,6 +32,9 @@ local tipTable = {
 function TipOfDay()
   math.randomseed(os.date("*t").yday + os.date("*t").year)
   local tip = tipTable[math.random(#tipTable)]
+  if os.date("*t").day == 31 and os.date("*t").month == 1 then
+    tip = "HAPPY BIRTHDAY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  end
   debugConsole("Tip Gotten, here it is: \""..tip..'"')
   return tip
 end

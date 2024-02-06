@@ -7,7 +7,10 @@
 
 -- The whole current cluster. AKA the project. This contains every animation.
 cluster = { -- There's a reason it's called a "cluster".
-  ["default"] = { -- Default animation
+  ---------------------------
+  ---- Default animation ----
+  ---------------------------
+  {
     frames = {
       { -- frame 1
         sprites = {

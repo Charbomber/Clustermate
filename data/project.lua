@@ -11,7 +11,8 @@ currentFrame = 1
 currentSprites = {}
 currentSpriteButtons = {}
 frameButtons = {}
-currentAnim = "default"
+animButtons = {}
+currentAnim = 1
 
 
 ---------------------
@@ -331,6 +332,14 @@ spriteWindow:SetHeight(love.graphics.getHeight())
 spriteWindow:SetDraggable(false)
 spriteWindow:ShowCloseButton(false)
 
+local spriteWindowScroll = loveframes.Create("list", spriteWindow)
+spriteWindowScroll:SetPos(0, 32)
+spriteWindowScroll:SetSize(64, 512)
+spriteWindowScroll:SetPadding(0)
+spriteWindowScroll:SetSpacing(0)
+spriteWindowScroll:SetDisplayType("vertical")
+spriteWindowScroll:SetAutoScroll(true)
+
 spriteWindow.Update = function(obj)
 
   spriteWindow:SetPos(love.graphics.getWidth()-64, 0)
@@ -340,14 +349,15 @@ end
 
 spriteWindow.generateList = function(obj)
 
-  for i=#currentSpriteButtons,1,-1 do
-    currentSpriteButtons[i]:Remove()
-    debugConsole("Removed Sprite Button")
-  end
-  currentSpriteButtons = {}
+  spriteWindowScroll:Clear()
+  --for i=#currentSpriteButtons,1,-1 do
+  --  currentSpriteButtons[i]:Remove()
+  --  debugConsole("Removed Sprite Button")
+  --end
+  --currentSpriteButtons = {}
 
   for i=1,#currentSprites do
-    currentSpriteButtons[i] = loveframes.Create("button", spriteWindow)
+    currentSpriteButtons[i] = loveframes.Create("button", spriteWindowScroll)
     currentSpriteButtons[i]:SetHeight(16)
     currentSpriteButtons[i]:SetWidth(64)
     currentSpriteButtons[i]:SetPos(0, (i*16)+16)
@@ -358,19 +368,21 @@ spriteWindow.generateList = function(obj)
         timeSinceSelected = 64
         makeEditSpriteWindow()
     end
+    spriteWindowScroll:AddItem(currentSpriteButtons[i])
   end
 
-  if addSpriteButton then
-    addSpriteButton:Remove()
-    addSpriteButton = nil
-    debugConsole("Removed Add Sprite Button")
-  end
+  --if addSpriteButton then
+  --  addSpriteButton:Remove()
+  --  addSpriteButton = nil
+  --  debugConsole("Removed Add Sprite Button")
+  --end
 
-  local addSpriteButton = loveframes.Create("button", spriteWindow)
+  local addSpriteButton = loveframes.Create("button", spriteWindowScroll)
   addSpriteButton:SetHeight(16)
   addSpriteButton:SetWidth(64)
   addSpriteButton:SetPos(0, (#currentSprites*16)+32)
   addSpriteButton:SetText("+")
+  spriteWindowScroll:AddItem(addSpriteButton)
   addSpriteButton.OnClick = function(obj, x, y)
     if #cluster[currentAnim].frames[currentFrame].sprites >= 999 then
       makeErrorWindow(999, "Really? Over 999?", "If you need more than 999 sprites,\nyou have a problem.")
@@ -606,6 +618,30 @@ function makeEditSpriteWindow()
   end
 
 
+  local actionsTable = loveframes.Create("columnlist", editSpriteWindow)
+  actionsTable:SetPos(16, 256-96-16)
+  actionsTable:SetSize(256-32, 96)
+  actionsTable:SetColumnHeight(16)
+  actionsTable:AddColumn("Action")
+  actionsTable:AddColumn("Arg1")
+  actionsTable:AddColumn("Arg2")
+  actionsTable:AddColumn("Arg3")
+  actionsTable:AddColumn("Arg4")
+  actionsTable:AddColumn("Arg5")
+  actionsTable:AddColumn("Arg6")
+  actionsTable:AddColumn("Arg7")
+
+  actionsTable:AddRow("-- + --")
+
+  actionsTable.OnRowSelected = function(parent, row, data)
+      if data[1] == "-- + --" then
+        actionsTable:AddRow("none", "0", "0", "0", "0", "0", "0", "0")
+      end
+  end
+  --for i=1, 20 do
+  --    actionsTable:AddRow("Row " ..i.. ", column 1", "Row " ..i.. ", column 2", "Row " ..i.. ", column 3", "Row " ..i.. ", column 4")
+  --end
+
 end
 
 
@@ -622,6 +658,49 @@ animationWindow:CenterY()
 animationWindow:SetWidth(128)
 animationWindow:SetHeight(256)
 animationWindow:ShowCloseButton(false)
+
+
+
+function genAnimations()
+
+  for i=#animButtons,1,-1 do
+    animButtons[i]:Remove()
+    debugConsole("Removed Animation Button")
+  end
+  animButtons = {}
+
+  for i=1,#cluster do
+
+    animButtons[i] = loveframes.Create("button", frameWindow)
+    animButtons[i].localID = i
+    animButtons[i]:SetText("graphics/frameEmpty.png")
+    animButtons[i]:SetPos(i*16, 32)
+    animButtons[i].OnClick = function(obj)
+      currentAnim = obj.localID
+      regenProject()
+    end
+
+  end
+
+  if addAnimButton then
+    addAnimButton:Remove()
+    addAnimButton = nil
+    debugConsole("Removed Add Animation Button")
+  end
+
+  addAnimButton = loveframes.Create("imagebutton", frameWindow)
+  addAnimButton:SetText("graphics/frameAdd.png")
+  addAnimButton:SetPos((#cluster[currentAnim].frames+1)*16, 32)
+  addAnimButton.OnClick = function(obj)
+    cluster[currentAnim].frames[#cluster[currentAnim].frames+1] = makeNewFrame()
+    addAnimButton:SetPos((#cluster[currentAnim].frames+1)*16, 32)
+    currentAnim = #cluster
+    regenProject()
+  end
+
+end
+
+
 
 
 --------------------

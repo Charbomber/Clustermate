@@ -1,4 +1,10 @@
 
+local splashStart = loveframes.Create("image")
+splashStart:SetState("start")
+splashStart:SetImage("graphics/ClustermateSplash.png")
+splashStart:SetPos(love.graphics.getWidth()-splashStart:GetImageWidth(), 0)
+
+
 local newButtonStart = loveframes.Create("button")
 
 newButtonStart:SetState("start")
@@ -37,6 +43,5 @@ loadButtonStart.OnClick = function(obj, x, y)
     end
     regenProject()
 end
-
 
 debugConsole("start.lua Loaded")
