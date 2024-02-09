@@ -26,6 +26,11 @@ local tipTable = {
   "Viewer Suggested Tip: Buy a man eat fish he day. teach a man, to a lifetime",
   "Trust nobody.",
   "DO NOT.",
+  "You can actually get more than one Health Potion at Jenka. She has infinite.",
+  "Remember to get the Tow Rope before the fight!",
+  "There's an indicator on the floor showing around where you're supposed to jump.",
+  "The NKC is weak to PK Ground!",
+  "I am SO fucking cool.",
 }
 
 

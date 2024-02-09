@@ -14,6 +14,8 @@ frameButtons = {}
 animButtons = {}
 currentAnim = 1
 
+selectedAction = 0
+
 
 ---------------------
 -- Background Grid --
@@ -635,7 +637,10 @@ function makeEditSpriteWindow()
 
   actionsTable.OnRowSelected = function(parent, row, data)
       if data[1] == "-- + --" then
-        actionsTable:AddRow("none", "0", "0", "0", "0", "0", "0", "0")
+        actionsTable:AddRow("nil", 0, 0, 0, 0, 0, 0, 0)
+      else
+        selectedAction = row
+        makeEditActionWindow()
       end
   end
   --for i=1, 20 do
@@ -644,6 +649,52 @@ function makeEditSpriteWindow()
 
 end
 
+
+
+------------------------
+-- Edit Action Window --
+------------------------
+
+
+function makeEditActionWindow()
+
+  if editActionWindow then
+    editActionWindow:Remove()
+  end
+
+  editActionWindow = loveframes.Create("frame")
+  editActionWindow:SetState("project")
+  editActionWindow:SetPos(128, 64)
+  editActionWindow:SetName("Edit Action")
+  editActionWindow:SetWidth(256)
+  editActionWindow:SetHeight(64)
+
+  local actionText = loveframes.Create("text", editActionWindow)
+  actionText:SetText("Action:")
+  actionText:SetPos(16, 32)
+
+  local actionInput = loveframes.Create("textinput", editActionWindow)
+  actionInput:SetPos(32, 32)
+  actionInput:SetWidth(48)
+  actionInput:SetHeight(16)
+  actionInput:SetText(tostring(cluster[currentAnim].frames[currentFrame].sprites[selectedSprite].actions[selectedAction].action))
+  actionInput.UpdateTextAction = function(obj)
+    actionInput:SetText(tostring(cluster[currentAnim].frames[currentFrame].sprites[selectedSprite].actions[selectedAction].action))
+  end
+  actionInput.UpdateSprite = function(obj, text)
+    if text:match("^%-?%d+$") then
+      obj:GetBaseParent().sprite.actions[selectedAction] = tonumber(obj:GetText())
+    else
+      obj:GetBaseParent().sprite.actions[selectedAction] = 0
+    end
+  end
+  actionInput.OnEnter = function(obj, text)
+    obj:UpdateSprite(text)
+  end
+
+
+
+end
 
 
 ---------------------------------
@@ -658,7 +709,13 @@ animationWindow:CenterY()
 animationWindow:SetWidth(128)
 animationWindow:SetHeight(256)
 animationWindow:ShowCloseButton(false)
+animationWindow.Update = function(obj)
+  obj:MakeTop()
+end
 
+animationList = loveframes.Create("list", animationWindow)
+animationList:SetPos(0, 32)
+animationList:SetSize(animationWindow:GetWidth(), animationWindow:GetHeight()-64)
 
 
 function genAnimations()
@@ -671,14 +728,19 @@ function genAnimations()
 
   for i=1,#cluster do
 
-    animButtons[i] = loveframes.Create("button", frameWindow)
+    animButtons[i] = loveframes.Create("button")
     animButtons[i].localID = i
-    animButtons[i]:SetText("graphics/frameEmpty.png")
-    animButtons[i]:SetPos(i*16, 32)
+    animButtons[i]:SetText(cluster[i].name)
+    --animButtons[i]:SetPos(16, 16+(i*16))
+    animButtons[i]:SetSize(96, 16)
     animButtons[i].OnClick = function(obj)
       currentAnim = obj.localID
+      currentFrame = 1
+      selectedSprite = 0
       regenProject()
     end
+    --animButtons[i]:SetState("project")
+    animationList:AddItem(animButtons[i])
 
   end
 
@@ -688,16 +750,34 @@ function genAnimations()
     debugConsole("Removed Add Animation Button")
   end
 
-  addAnimButton = loveframes.Create("imagebutton", frameWindow)
-  addAnimButton:SetText("graphics/frameAdd.png")
-  addAnimButton:SetPos((#cluster[currentAnim].frames+1)*16, 32)
+  addAnimButton = loveframes.Create("button")
+  addAnimButton:SetText("+")
+  --addAnimButton:SetPos(16, 16+((#cluster+1)*16))
+  addAnimButton:SetSize(96, 16)
   addAnimButton.OnClick = function(obj)
-    cluster[currentAnim].frames[#cluster[currentAnim].frames+1] = makeNewFrame()
-    addAnimButton:SetPos((#cluster[currentAnim].frames+1)*16, 32)
+    cluster[#cluster+1] = makeNewAnim()
+    addAnimButton:SetPos(16, 16+((#cluster+1)*16))
     currentAnim = #cluster
+    currentFrame = 1
+    selectedSprite = 0
     regenProject()
   end
+  --addAnimButton:SetState("project")
+  animationList:AddItem(addAnimButton)
 
+end
+
+
+function makeNewAnim()
+  local tempTable = { -- new anim
+    name = "New Animation",
+    frames = {
+      {
+        sprites={}
+      }
+    },
+  }
+  return tempTable
 end
 
 
@@ -740,6 +820,7 @@ end
 function regenProject()
   genFrames()
   genSprites()
+  genAnimations()
   spriteWindow:generateList()
 end
 

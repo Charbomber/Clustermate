@@ -55,7 +55,11 @@ function love.errorhandler(msg)
 
 	local err = {}
 
-	table.insert(err, "Oops! My system crashed, but I had an anti-virus!\n")
+	if getCrashMsg() then
+		table.insert(err, getCrashMsg())
+	else
+		table.insert(err, "Oops! My system crashed, but I had an anti-virus!\n")
+	end
 	table.insert(err, sanitizedmsg)
 
 	if #sanitizedmsg ~= #msg then
@@ -128,4 +132,21 @@ function love.errorhandler(msg)
 		end
 	end
 
+end
+
+local crashTable = {
+  "Oops! My system crashed, but I had an anti-virus!\n",
+  "D'OH!\n",
+	"You got the dud!\n",
+	"User error!\n",
+	"Stupidface! Dummy! Loser!\n",
+	"oops\n",
+}
+
+function getCrashMsg()
+
+	math.randomseed(os.time())
+	local msg = crashTable[math.random(#crashTable)]
+
+	return msg
 end

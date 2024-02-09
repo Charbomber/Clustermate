@@ -11,6 +11,7 @@ cluster = { -- There's a reason it's called a "cluster".
   ---- Default animation ----
   ---------------------------
   {
+    name = "New Animation",
     frames = {
       { -- frame 1
         sprites = {
@@ -23,7 +24,7 @@ cluster = { -- There's a reason it's called a "cluster".
             y = 0,
             scalex = 1,
             scaley = 1,
-            actions = {["scaleIncreaseOverTime"] = 2}
+            actions = {["scaleIncreaseOverTime"] = {2, 0, 0, 0, 0, 0, 0}}
           }
         },
       },
@@ -65,7 +66,7 @@ cluster = { -- There's a reason it's called a "cluster".
             y = 0,
             scalex = "noChange",
             scaley = "noChange",
-            actions = {["scaleIncreaseOverTime"] = 0}
+            actions = {["scaleIncreaseOverTime"] = {0, 0, 0, 0, 0, 0, 0}}
           }
         },
       },
